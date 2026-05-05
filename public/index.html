@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Gemini - Test Playground</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: #1e293b;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: linear-gradient(to right, #1e293b, #0f172a);
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: -webkit-linear-gradient(45deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            flex: 1;
+            width: 100%;
+        }
+
+        .card {
+            background-color: var(--surface-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 2rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-wrapper:hover {
+            border-color: var(--primary);
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+
+        .file-upload-wrapper input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .status {
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            text-align: center;
+            min-height: 20px;
+        }
+        
+        .status.success { color: var(--success); }
+        .status.error { color: var(--error); }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .chat-history {
+            flex: 1;
+            background-color: rgba(15, 23, 42, 0.5);
+            border-radius: 12px;
+            padding: 1rem;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-height: 500px;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 1rem;
+            border-radius: 12px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background-color: var(--primary);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.ai {
+            align-self: flex-start;
+            background-color: var(--border);
+            color: var(--text);
+            border-bottom-left-radius: 4px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>RAG Gemini Playground</h1>
+        <p style="color: var(--text-muted)">Faça o upload de documentos e converse com a base de conhecimento.</p>
+    </header>
+
+    <div class="container">
+        <!-- Sidebar - Upload -->
+        <div class="card">
+            <h2>1. Alimentar a Base</h2>
+            <p style="font-size: 0.875rem; color: var(--text-muted);">Envie arquivos PDF ou Texto para criar o contexto RAG.</p>
+            
+            <form id="uploadForm">
+                <div class="file-upload-wrapper">
+                    <input type="file" id="fileInput" name="file" accept=".pdf,.txt,.md" required>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="margin-bottom: 0.5rem; color: var(--text-muted);">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <p id="fileName" style="font-weight: 500;">Clique ou arraste um arquivo</p>
+                    <p style="font-size: 0.75rem; color: var(--text-muted);">Apenas PDF, TXT ou MD</p>
+                </div>
+                <button type="submit" class="btn" id="uploadBtn" style="width: 100%; margin-top: 1rem;">
+                    <div class="spinner" id="uploadSpinner"></div>
+                    <span>Processar Documento</span>
+                </button>
+            </form>
+            <div id="uploadStatus" class="status"></div>
+        </div>
+
+        <!-- Main Content - Chat -->
+        <div class="card chat-container">
+            <h2>2. Consultar o RAG</h2>
+            
+            <div class="chat-history" id="chatHistory">
+                <div class="message ai">Olá! Envie um documento ao lado e me faça perguntas sobre ele. O Gemini irá responder baseado no contexto do seu arquivo.</div>
+            </div>
+
+            <form id="queryForm" class="input-group">
+                <input type="text" id="questionInput" placeholder="Pergunte algo sobre os documentos..." required autocomplete="off">
+                <button type="submit" class="btn" id="askBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+        const uploadForm = document.getElementById('uploadForm');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const uploadSpinner = document.getElementById('uploadSpinner');
+        const uploadStatus = document.getElementById('uploadStatus');
+
+        const queryForm = document.getElementById('queryForm');
+        const questionInput = document.getElementById('questionInput');
+        const chatHistory = document.getElementById('chatHistory');
+        const askBtn = document.getElementById('askBtn');
+
+        // Atualizar nome do arquivo selecionado
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                fileName.textContent = e.target.files[0].name;
+                fileName.style.color = 'var(--primary)';
+            } else {
+                fileName.textContent = 'Clique ou arraste um arquivo';
+                fileName.style.color = 'inherit';
+            }
+        });
+
+        // Lidar com o Upload de Arquivos
+        uploadForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            uploadBtn.disabled = true;
+            uploadSpinner.style.display = 'block';
+            uploadBtn.querySelector('span').textContent = 'Enviando...';
+            uploadStatus.textContent = '';
+            uploadStatus.className = 'status';
+
+            try {
+                const response = await fetch('/documents/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    uploadStatus.textContent = 'Documento indexado com sucesso!';
+                    uploadStatus.classList.add('success');
+                    fileInput.value = '';
+                    fileName.textContent = 'Clique ou arraste um arquivo';
+                    fileName.style.color = 'inherit';
+                } else {
+                    throw new Error(data.message || 'Erro ao processar');
+                }
+            } catch (error) {
+                uploadStatus.textContent = 'Erro: ' + error.message;
+                uploadStatus.classList.add('error');
+            } finally {
+                uploadBtn.disabled = false;
+                uploadSpinner.style.display = 'none';
+                uploadBtn.querySelector('span').textContent = 'Processar Documento';
+            }
+        });
+
+        function appendMessage(text, sender, isStream = false) {
+            let msgDiv;
+            if (isStream && chatHistory.lastElementChild && chatHistory.lastElementChild.classList.contains('ai') && chatHistory.lastElementChild.getAttribute('data-streaming') === 'true') {
+                msgDiv = chatHistory.lastElementChild;
+                msgDiv.innerHTML += text;
+            } else {
+                msgDiv = document.createElement('div');
+                msgDiv.classList.add('message', sender);
+                if (isStream) msgDiv.setAttribute('data-streaming', 'true');
+                msgDiv.innerHTML = text;
+                chatHistory.appendChild(msgDiv);
+            }
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+            return msgDiv;
+        }
+
+        function finalizeStream() {
+            if (chatHistory.lastElementChild && chatHistory.lastElementChild.getAttribute('data-streaming')) {
+                chatHistory.lastElementChild.removeAttribute('data-streaming');
+            }
+        }
+
+        // Lidar com a consulta ao RAG (Usando SSE / Stream)
+        queryForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const question = questionInput.value.trim();
+            if (!question) return;
+
+            // Adiciona mensagem do user
+            appendMessage(question, 'user');
+            questionInput.value = '';
+            askBtn.disabled = true;
+
+            try {
+                const response = await fetch('/rag/stream', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ question, topK: 3 })
+                });
+
+                if (!response.ok) throw new Error("Erro na requisição");
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder('utf-8');
+
+                let streamMsgStarted = false;
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n');
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const dataStr = line.slice(6).trim();
+                            if (!dataStr) continue;
+                            
+                            try {
+                                const data = JSON.parse(dataStr);
+                                if (data.type === 'token') {
+                                    if (!streamMsgStarted) {
+                                        appendMessage(data.content, 'ai', true);
+                                        streamMsgStarted = true;
+                                    } else {
+                                        appendMessage(data.content, 'ai', true);
+                                    }
+                                } else if (data.type === 'sources') {
+                                    // Se quiser exibir as fontes, pode fazer aqui. Por enquanto apenas log.
+                                    console.log("Fontes utilizadas:", data.content);
+                                } else if (data.success === false) {
+                                    appendMessage("Houve um erro ao processar sua resposta.", 'ai');
+                                }
+                            } catch (e) {
+                                // Pode haver dados fracionados no JSON.parse em chunks muito pequenos.
+                                // Em uma implementação SSE mais robusta a gente faria buffer das linhas.
+                                console.warn("Erro ao parsear chunk:", dataStr);
+                            }
+                        }
+                    }
+                }
+                finalizeStream();
+
+            } catch (error) {
+                appendMessage("Desculpe, ocorreu um erro de conexão com a API.", 'ai');
+            } finally {
+                askBtn.disabled = false;
+                questionInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>

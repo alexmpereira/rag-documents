@@ -15,7 +15,7 @@ export async function initQdrantCollection() {
 	if (!exists) {
 		await qdrantClient.createCollection(config.qdrant.collectionName, {
 			vectors: {
-				size: 1536, // Tamanho do vetor do OpenAI Embedding para text-embedding-3-small
+				size: 3072, // Tamanho do vetor do Gemini Embedding (gemini-embedding-2)
 				distance: "Cosine", // Métrica padrão de similaridade para embeddings de texto
 			},
 		});

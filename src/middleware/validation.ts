@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { z } from "zod";
 import { AppError } from "./errorHandler.js";
+import { fileUploadSchema } from "../schemas/index.js";
 
 export function validateSchema<T extends z.ZodTypeAny>(schema: T) {
 	return (req: Request, res: Response, next: NextFunction) => {
@@ -26,7 +27,6 @@ export function validateFile(req: Request, res: Response, next: NextFunction) {
 		if (!req.file) {
 			throw new AppError(400, "Nenhum arquivo enviado");
 		}
-		const { fileUploadSchema } = require("../schemas/index.js");
 
 		fileUploadSchema.parse({
 			mimeType: req.file.mimetype,

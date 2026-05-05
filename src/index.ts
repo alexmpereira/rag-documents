@@ -17,6 +17,8 @@ app.use(
 	}),
 );
 
+app.use(express.static("public"));
+
 app.get("/health", (req, res) => {
 	res.send("OK");
 });
@@ -37,6 +39,7 @@ async function start() {
 
 		app.listen(config.server.port, () => {
 			console.log(`✔︎ Server is running on port ${config.server.port}`);
+			console.log(`✔︎ Qdrant collection ready!`);
 		});
 	} catch (error) {
 		console.error("✕ Error starting server:", error);
@@ -45,3 +48,7 @@ async function start() {
 }
 
 start();
+
+// restart
+
+// force init

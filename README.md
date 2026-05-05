@@ -1,7 +1,7 @@
 # RAG API Project
 
 ## Contexto do Projeto
-Este projeto é uma API em Node.js (usando Express e TypeScript) que implementa um sistema de RAG (Retrieval-Augmented Generation). Ele permite o upload de documentos para extração de conteúdo, os quais são convertidos em vetores e armazenados em um banco de dados vetorial (Qdrant). A partir disso, o sistema utiliza a OpenAI para responder perguntas baseadas no contexto extraído dos documentos, com suporte a respostas completas ou via stream (Server-Sent Events).
+Este projeto é uma API em Node.js (usando Express e TypeScript) que implementa um sistema de RAG (Retrieval-Augmented Generation). Ele permite o upload de documentos para extração de conteúdo, os quais são convertidos em vetores e armazenados em um banco de dados vetorial (Qdrant). A partir disso, o sistema utiliza o Google Gemini para responder perguntas baseadas no contexto extraído dos documentos, com suporte a respostas completas ou via stream (Server-Sent Events).
 
 ## Endpoints
 
@@ -43,7 +43,7 @@ Busca por trechos de documentos armazenados no banco vetorial que sejam mais sim
   ```
 
 ### 4. Consulta RAG (Retrieval-Augmented Generation)
-Busca o contexto no banco de dados e utiliza a OpenAI para formular uma resposta consolidada com base nesse contexto.
+Busca o contexto no banco de dados e utiliza o Gemini para formular uma resposta consolidada com base nesse contexto.
 - **Rota:** `POST /rag`
 - **Body:** JSON
   ```json
@@ -101,9 +101,9 @@ Mesma funcionalidade do endpoint RAG, porém a resposta é transmitida em partes
    ```
 
 4. **Configuração de Variáveis de Ambiente:**
-   Crie um arquivo `.env` na raiz do projeto contendo sua chave da OpenAI. As outras variáveis possuem valores padrão, mas podem ser sobrescritas:
+   Crie um arquivo `.env` na raiz do projeto contendo sua chave do Google Gemini. As outras variáveis possuem valores padrão, mas podem ser sobrescritas:
    ```env
-   OPENAI_API_KEY="sua_chave_da_openai_aqui"
+   GEMINI_API_KEY="sua_chave_do_gemini_aqui"
    
    # Opcionais (valores padrão indicados abaixo)
    # QDRANT_URL=http://localhost:6333

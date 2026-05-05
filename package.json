@@ -17,6 +17,7 @@
   "dependencies": {
     "@langchain/community": "^1.0.0",
     "@langchain/core": "^1.0.1",
+    "@langchain/google-genai": "^2.1.30",
     "@qdrant/js-client-rest": "^1.15.1",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",

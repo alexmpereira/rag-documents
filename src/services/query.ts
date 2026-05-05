@@ -1,6 +1,6 @@
 import { config } from "../config.js";
 import type { QueryRequest, QueryResponse, SearchResponse } from "../types.js";
-import { embeddings } from "./openai.js";
+import { embeddings } from "./gemini.js";
 import { qdrantClient } from "./qdrant.js";
 
 export async function searchDocuments({

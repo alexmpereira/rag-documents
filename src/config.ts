@@ -5,9 +5,9 @@ dotenv.config();
 const MAX_FILE_SIZE_10MB = 10 * 1024 * 1024;
 
 export const config = {
-	openai: {
+	gemini: {
 		// biome-ignore lint/style/noNonNullAssertion: We ensure this variable is set below
-		apiKey: process.env.OPENAI_API_KEY!,
+		apiKey: process.env.GEMINI_API_KEY!,
 	},
 	qdrant: {
 		url: process.env.QDRANT_URL || "http://localhost:6333",
@@ -22,6 +22,6 @@ export const config = {
 	},
 } as const;
 
-if (!config.openai.apiKey) {
-	throw new Error("OPENAI_API_KEY is not set in environment variables");
+if (!config.gemini.apiKey) {
+	throw new Error("GEMINI_API_KEY is not set in environment variables");
 }

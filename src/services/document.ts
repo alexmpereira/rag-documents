@@ -3,7 +3,7 @@ import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 import { v4 as uuidv4 } from "uuid";
 import { config } from "../config.js";
 import type { UploadResponse } from "../types.js";
-import { embeddings } from "./openai.js";
+import { embeddings } from "./gemini.js";
 import { qdrantClient } from "./qdrant.js";
 
 const textSplitter = new RecursiveCharacterTextSplitter({

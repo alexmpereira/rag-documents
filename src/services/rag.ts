@@ -2,7 +2,7 @@ import { StringOutputParser } from "@langchain/core/output_parsers";
 import { ChatPromptTemplate } from "@langchain/core/prompts";
 import type { Response } from "express";
 import type { QueryRequest, RAGResponse } from "../types.js";
-import { llm } from "./openai.js";
+import { llm } from "./gemini.js";
 import { searchDocuments } from "./query.js";
 
 const RAG_PROMPT_TEMPLATE = ChatPromptTemplate.fromMessages([
